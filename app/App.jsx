@@ -239,7 +239,8 @@ export default function App() {
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">キャラクター設定</h2>
           
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+          {/* デスクトップ版（lg以上）：グリッド表示 */}
+          <div className="hidden lg:grid grid-cols-8 gap-4">
             {fighters.map(fighter => (
               <div
                 key={fighter.id}
@@ -271,6 +272,94 @@ export default function App() {
                 <div className="mt-2 text-sm font-bold text-center text-orange-700">
                   {fighter.weight === 0 ? 'OFF' : `重み: ${fighter.weight}`}
                 </div>
+              </div>
+            ))}
+          </div>
+
+          {/* タブレット版（md～lg）：3-6列グリッド表示 */}
+          <div className="hidden md:grid lg:hidden grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+            {fighters.map(fighter => (
+              <div
+                key={fighter.id}
+                onClick={() => handleCardToggle(fighter.id)}
+                className={`p-4 rounded-lg shadow-md border-2 cursor-pointer transition-all hover:shadow-lg ${
+                  fighter.weight === 0
+                    ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
+                    : 'border-orange-400 bg-orange-50 hover:border-orange-500'
+                }`}
+              >
+                {/* キャラ名 */}
+                <p className="text-sm font-bold text-center text-gray-800 mb-3 truncate">
+                  {fighter.name}
+                </p>
+
+                {/* 数値入力 */}
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={fighter.weight}
+                  onChange={(e) => handleWeightChange(fighter.id, e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full px-2 py-2 text-center text-lg font-black border border-orange-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-orange-900"
+                  disabled={fighter.weight === 0}
+                />
+
+                {/* 重みラベル */}
+                <div className="mt-2 text-sm font-bold text-center text-orange-700">
+                  {fighter.weight === 0 ? 'OFF' : `重み: ${fighter.weight}`}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* スマホ版（md未満）：グリッド + スライダー表示 */}
+          <div className="md:hidden grid grid-cols-3 gap-4">
+            {fighters.map(fighter => (
+              <div
+                key={fighter.id}
+                className={`p-4 rounded-lg shadow-md border-2 transition-all ${
+                  fighter.weight === 0
+                    ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
+                    : 'border-orange-400 bg-orange-50'
+                }`}
+              >
+                {/* キャラ名 */}
+                <p className="text-sm font-bold text-center text-gray-800 mb-3 truncate">
+                  {fighter.name}
+                </p>
+
+                {/* スライダー */}
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={fighter.weight}
+                  onChange={(e) => handleWeightChange(fighter.id, e.target.value)}
+                  className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider mb-3"
+                  style={{
+                    background: fighter.weight === 0 
+                      ? '#d1d5db' 
+                      : `linear-gradient(to right, #f97316 0%, #f97316 ${fighter.weight * 10}%, #e5e7eb ${fighter.weight * 10}%, #e5e7eb 100%)`
+                  }}
+                />
+
+                {/* 重みラベル */}
+                <div className="text-center text-sm font-bold text-orange-700">
+                  {fighter.weight === 0 ? '⊗ OFF' : `${fighter.weight}`}
+                </div>
+
+                {/* トグルボタン */}
+                <button
+                  onClick={() => handleCardToggle(fighter.id)}
+                  className="w-full mt-2 text-xs font-bold py-1 px-2 rounded transition-all"
+                  style={{
+                    backgroundColor: fighter.weight === 0 ? '#fed7aa' : '#fef3c7',
+                    color: fighter.weight === 0 ? '#92400e' : '#78350f'
+                  }}
+                >
+                  {fighter.weight === 0 ? 'ON' : 'OFF'}
+                </button>
               </div>
             ))}
           </div>
