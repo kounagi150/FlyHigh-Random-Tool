@@ -89,38 +89,56 @@ const INITIAL_FIGHTERS = [
 ];
 
 export default function App() {
-  // 重みを含むファイター状態
+  // weight を { player1, player2 } のオブジェクトに変更
   const [fighters, setFighters] = useState(
-    INITIAL_FIGHTERS.map(f => ({ ...f, weight: 5 }))
+    INITIAL_FIGHTERS.map(f => ({ ...f, weight: { player1: 5, player2: 5 } }))
   );
   
   const [selectedFighter1, setSelectedFighter1] = useState(null);
   const [selectedFighter2, setSelectedFighter2] = useState(null);
   const [isShowingResult, setIsShowingResult] = useState(false);
 
-  // 重みを更新
-  const handleWeightChange = (id, weight) => {
-    setFighters(
-      fighters.map(f => (f.id === id ? { ...f, weight: parseInt(weight, 10) } : f))
-    );
-  };
-
-  // カード名クリックでトグル (0 <-> 5)
-  const handleCardToggle = (id) => {
+  // プレイヤーごとに比率を更新
+  const handleWeightChange = (id, player, weight) => {
     setFighters(
       fighters.map(f => {
         if (f.id === id) {
-          return { ...f, weight: f.weight === 0 ? 5 : 0 };
+          return {
+            ...f,
+            weight: {
+              ...f.weight,
+              [player]: parseInt(weight, 10)
+            }
+          };
         }
         return f;
       })
     );
   };
 
-  // リセット
+  // カード名クリックでトグル (両プレイヤー共に 0 <-> 5)
+  const handleCardToggle = (id) => {
+    setFighters(
+      fighters.map(f => {
+        if (f.id === id) {
+          const isOff = f.weight.player1 === 0 && f.weight.player2 === 0;
+          return {
+            ...f,
+            weight: {
+              player1: isOff ? 5 : 0,
+              player2: isOff ? 5 : 0
+            }
+          };
+        }
+        return f;
+      })
+    );
+  };
+
+  // すべて5にリセット
   const handleReset = () => {
     setFighters(
-      fighters.map(f => ({ ...f, weight: 5 }))
+      fighters.map(f => ({ ...f, weight: { player1: 5, player2: 5 } }))
     );
     setIsShowingResult(false);
   };
@@ -128,49 +146,61 @@ export default function App() {
   // すべてOFF
   const handleAllOff = () => {
     setFighters(
-      fighters.map(f => ({ ...f, weight: 0 }))
+      fighters.map(f => ({ ...f, weight: { player1: 0, player2: 0 } }))
     );
     setIsShowingResult(false);
   };
 
-  // 重み付き抽選ロジック（2人分）
+  // プレイヤーごとの重み付き抽選ロジック
   const handleOmakase = () => {
-    // weight > 0 のキャラクターのみ抽出
-    const candidates = fighters.filter(f => f.weight > 0);
+    // 選択されたプレイヤーを確認（ボタンから判定）
+    // 現在は両プレイヤーの抽選を行う
+    selectPlayers();
+  };
 
-    if (candidates.length === 0) {
-      alert('重みが0より大きいキャラクターを選択してください！');
+  // プレイヤーの選出処理
+  const selectPlayers = () => {
+    // player1の比率 > 0 のキャラクターを抽出
+    const candidates1 = fighters.filter(f => f.weight.player1 > 0);
+    // player2の比率 > 0 のキャラクターを抽出
+    const candidates2 = fighters.filter(f => f.weight.player2 > 0);
+
+    if (candidates1.length === 0 || candidates2.length === 0) {
+      alert('両プレイヤーで比率が0より大きいキャラクターを選択してください！');
       return;
     }
 
-    if (candidates.length === 1) {
-      alert('2人選出するには、重みが0より大きいキャラクターが2体以上必要です！');
+    if (candidates1.length === 1 && candidates2.length === 1 && candidates1[0].id === candidates2[0].id) {
+      alert('異なるキャラクターを選出できる設定にしてください！');
       return;
     }
 
-    // 合計重みを計算
-    const totalWeight = candidates.reduce((sum, f) => sum + f.weight, 0);
-
-    // プレイヤー1を選出
-    let randomNumber1 = Math.floor(Math.random() * totalWeight) + 1;
+    // プレイヤー1を選出（player1の比率に基づいて）
+    const totalWeight1 = candidates1.reduce((sum, f) => sum + f.weight.player1, 0);
+    let randomNumber1 = Math.floor(Math.random() * totalWeight1) + 1;
     let currentWeightSum = 0;
     let selected1 = null;
-    for (const fighter of candidates) {
-      currentWeightSum += fighter.weight;
+    for (const fighter of candidates1) {
+      currentWeightSum += fighter.weight.player1;
       if (randomNumber1 <= currentWeightSum) {
         selected1 = fighter;
         break;
       }
     }
 
-    // プレイヤー2を選出（プレイヤー1と異なるキャラクター）
-    const candidates2 = candidates.filter(f => f.id !== selected1.id);
-    const totalWeight2 = candidates2.reduce((sum, f) => sum + f.weight, 0);
+    // プレイヤー2を選出（player2の比率に基づいて、プレイヤー1と異なるキャラクター）
+    const candidates2Filtered = candidates2.filter(f => f.id !== selected1.id);
+    if (candidates2Filtered.length === 0) {
+      alert('プレイヤー2で異なるキャラクターが選出できる設定にしてください！');
+      return;
+    }
+
+    const totalWeight2 = candidates2Filtered.reduce((sum, f) => sum + f.weight.player2, 0);
     let randomNumber2 = Math.floor(Math.random() * totalWeight2) + 1;
     currentWeightSum = 0;
     let selected2 = null;
-    for (const fighter of candidates2) {
-      currentWeightSum += fighter.weight;
+    for (const fighter of candidates2Filtered) {
+      currentWeightSum += fighter.weight.player2;
       if (randomNumber2 <= currentWeightSum) {
         selected2 = fighter;
         break;
@@ -198,8 +228,8 @@ export default function App() {
               <h1 className="text-4xl font-black text-orange-600">FlyHigh!!</h1>
               <p className="text-xl font-bold text-gray-700">Omakase Tool</p>
             </div>
-            {/* 右上：ロゴ */}
-            <img src="/FHtouka.png" alt="FlyHigh Logo" className="h-12 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+            {/* 右上：ロゴ（サイズ拡大） */}
+            <img src="/FHtouka.png" alt="FlyHigh Logo" className="h-20 w-auto opacity-70 hover:opacity-100 transition-opacity" />
           </div>
         </div>
       </header>
@@ -215,7 +245,7 @@ export default function App() {
                 onClick={handleReset}
                 className="px-6 py-3 bg-white border-2 border-orange-500 text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition-all shadow-md"
               >
-                🔄 リセット
+                🔄 すべて5
               </button>
               <button
                 onClick={handleAllOff}
@@ -246,7 +276,7 @@ export default function App() {
                 key={fighter.id}
                 onClick={() => handleCardToggle(fighter.id)}
                 className={`p-4 rounded-lg shadow-md border-2 cursor-pointer transition-all hover:shadow-lg ${
-                  fighter.weight === 0
+                  fighter.weight.player1 === 0 && fighter.weight.player2 === 0
                     ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
                     : 'border-orange-400 bg-orange-50 hover:border-orange-500'
                 }`}
@@ -256,21 +286,34 @@ export default function App() {
                   {fighter.name}
                 </p>
 
-                {/* 数値入力 */}
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={fighter.weight}
-                  onChange={(e) => handleWeightChange(fighter.id, e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-full px-2 py-2 text-center text-lg font-black border border-orange-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-orange-900"
-                  disabled={fighter.weight === 0}
-                />
+                {/* プレイヤー1の比率入力 */}
+                <div className="mb-2">
+                  <label className="text-xs font-bold text-blue-600">P1比率</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={fighter.weight.player1}
+                    onChange={(e) => handleWeightChange(fighter.id, 'player1', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full px-2 py-1 text-center text-sm font-bold border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900"
+                    disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
+                  />
+                </div>
 
-                {/* 重みラベル */}
-                <div className="mt-2 text-sm font-bold text-center text-orange-700">
-                  {fighter.weight === 0 ? 'OFF' : `重み: ${fighter.weight}`}
+                {/* プレイヤー2の比率入力 */}
+                <div>
+                  <label className="text-xs font-bold text-red-600">P2比率</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={fighter.weight.player2}
+                    onChange={(e) => handleWeightChange(fighter.id, 'player2', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full px-2 py-1 text-center text-sm font-bold border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-red-900"
+                    disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
+                  />
                 </div>
               </div>
             ))}
@@ -283,7 +326,7 @@ export default function App() {
                 key={fighter.id}
                 onClick={() => handleCardToggle(fighter.id)}
                 className={`p-4 rounded-lg shadow-md border-2 cursor-pointer transition-all hover:shadow-lg ${
-                  fighter.weight === 0
+                  fighter.weight.player1 === 0 && fighter.weight.player2 === 0
                     ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
                     : 'border-orange-400 bg-orange-50 hover:border-orange-500'
                 }`}
@@ -293,21 +336,34 @@ export default function App() {
                   {fighter.name}
                 </p>
 
-                {/* 数値入力 */}
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={fighter.weight}
-                  onChange={(e) => handleWeightChange(fighter.id, e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-full px-2 py-2 text-center text-lg font-black border border-orange-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-orange-900"
-                  disabled={fighter.weight === 0}
-                />
+                {/* プレイヤー1の比率入力 */}
+                <div className="mb-2">
+                  <label className="text-xs font-bold text-blue-600">P1</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={fighter.weight.player1}
+                    onChange={(e) => handleWeightChange(fighter.id, 'player1', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full px-2 py-1 text-center text-sm font-bold border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900"
+                    disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
+                  />
+                </div>
 
-                {/* 重みラベル */}
-                <div className="mt-2 text-sm font-bold text-center text-orange-700">
-                  {fighter.weight === 0 ? 'OFF' : `重み: ${fighter.weight}`}
+                {/* プレイヤー2の比率入力 */}
+                <div>
+                  <label className="text-xs font-bold text-red-600">P2</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={fighter.weight.player2}
+                    onChange={(e) => handleWeightChange(fighter.id, 'player2', e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full px-2 py-1 text-center text-sm font-bold border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-red-900"
+                    disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
+                  />
                 </div>
               </div>
             ))}
@@ -319,7 +375,7 @@ export default function App() {
               <div
                 key={fighter.id}
                 className={`p-4 rounded-lg shadow-md border-2 transition-all ${
-                  fighter.weight === 0
+                  fighter.weight.player1 === 0 && fighter.weight.player2 === 0
                     ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
                     : 'border-orange-400 bg-orange-50'
                 }`}
@@ -329,24 +385,42 @@ export default function App() {
                   {fighter.name}
                 </p>
 
-                {/* スライダー */}
-                <input
-                  type="range"
-                  min="0"
-                  max="10"
-                  value={fighter.weight}
-                  onChange={(e) => handleWeightChange(fighter.id, e.target.value)}
-                  className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider mb-3"
-                  style={{
-                    background: fighter.weight === 0 
-                      ? '#d1d5db' 
-                      : `linear-gradient(to right, #f97316 0%, #f97316 ${fighter.weight * 10}%, #e5e7eb ${fighter.weight * 10}%, #e5e7eb 100%)`
-                  }}
-                />
+                {/* プレイヤー1のスライダー */}
+                <div className="mb-2">
+                  <label className="text-xs font-bold text-blue-600">P1:</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={fighter.weight.player1}
+                    onChange={(e) => handleWeightChange(fighter.id, 'player1', e.target.value)}
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: fighter.weight.player1 === 0 
+                        ? '#d1d5db' 
+                        : `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${fighter.weight.player1 * 10}%, #e5e7eb ${fighter.weight.player1 * 10}%, #e5e7eb 100%)`
+                    }}
+                  />
+                  <div className="text-center text-xs font-bold text-blue-700">{fighter.weight.player1}</div>
+                </div>
 
-                {/* 重みラベル */}
-                <div className="text-center text-sm font-bold text-orange-700">
-                  {fighter.weight === 0 ? '⊗ OFF' : `${fighter.weight}`}
+                {/* プレイヤー2のスライダー */}
+                <div className="mb-2">
+                  <label className="text-xs font-bold text-red-600">P2:</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={fighter.weight.player2}
+                    onChange={(e) => handleWeightChange(fighter.id, 'player2', e.target.value)}
+                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: fighter.weight.player2 === 0 
+                        ? '#d1d5db' 
+                        : `linear-gradient(to right, #ef4444 0%, #ef4444 ${fighter.weight.player2 * 10}%, #e5e7eb ${fighter.weight.player2 * 10}%, #e5e7eb 100%)`
+                    }}
+                  />
+                  <div className="text-center text-xs font-bold text-red-700">{fighter.weight.player2}</div>
                 </div>
 
                 {/* トグルボタン */}
@@ -354,11 +428,11 @@ export default function App() {
                   onClick={() => handleCardToggle(fighter.id)}
                   className="w-full mt-2 text-xs font-bold py-1 px-2 rounded transition-all"
                   style={{
-                    backgroundColor: fighter.weight === 0 ? '#fed7aa' : '#fef3c7',
-                    color: fighter.weight === 0 ? '#92400e' : '#78350f'
+                    backgroundColor: fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? '#fed7aa' : '#fef3c7',
+                    color: fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? '#92400e' : '#78350f'
                   }}
                 >
-                  {fighter.weight === 0 ? 'ON' : 'OFF'}
+                  {fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? 'ON' : 'OFF'}
                 </button>
               </div>
             ))}
