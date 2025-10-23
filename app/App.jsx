@@ -218,18 +218,18 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* ヘッダー */}
-      <header className="bg-white border-b-2 border-orange-200 shadow-sm sticky top-0 z-40">
+      <header className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between">
             {/* 中央：タイトル */}
             <div className="flex-1 flex items-center justify-center gap-4">
-              <img src="/FHTxt_touka.png" alt="FlyHigh" className="h-16 w-auto" />
-              <p className="text-xl font-bold text-gray-700">Omakase Tool</p>
+              <img src="/FHTxt_touka.png" alt="FlyHigh" className="h-14 w-auto" />
+              <p className="text-lg font-bold text-gray-800">Omakase Tool</p>
             </div>
-            {/* 右上：ロゴ（サイズ拡大） */}
-            <img src="/FHtouka.png" alt="FlyHigh Logo" className="h-20 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+            {/* 右上：ロゴ（さらに大きく） */}
+            <img src="/FHtouka.png" alt="FlyHigh Logo" className="h-32 w-auto opacity-80 hover:opacity-100 transition-opacity" />
           </div>
         </div>
       </header>
@@ -237,19 +237,19 @@ export default function App() {
       {/* メインコンテンツ */}
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* グローバルコントロール */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8 border border-gray-100">
+        <div className="bg-white shadow-md p-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             {/* 左側：ボタン群 */}
             <div className="flex gap-3 flex-wrap justify-center sm:justify-start">
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-white border-2 border-orange-500 text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition-all shadow-md"
+                className="px-6 py-3 bg-white border-2 border-orange-500 text-orange-600 font-bold transition-all hover:bg-orange-500 hover:text-white hover:shadow-lg"
               >
                 🔄 すべて5
               </button>
               <button
                 onClick={handleAllOff}
-                className="px-6 py-3 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-all shadow-md"
+                className="px-6 py-3 bg-white border-2 border-gray-400 text-gray-700 font-bold transition-all hover:bg-gray-400 hover:text-white hover:shadow-lg"
               >
                 ⊗ すべてOFF
               </button>
@@ -258,7 +258,7 @@ export default function App() {
             {/* 右側：おまかせボタン（目立つ） */}
             <button
               onClick={handleOmakase}
-              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-black text-xl rounded-lg hover:from-orange-600 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95"
+              className="px-8 py-4 bg-orange-500 text-white font-black text-lg transition-all hover:bg-orange-600 hover:shadow-lg active:scale-95"
             >
               🎮 おまかせ！
             </button>
@@ -266,8 +266,8 @@ export default function App() {
         </div>
 
         {/* キャラクターグリッド */}
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">キャラクター設定</h2>
+        <div className="bg-white shadow-md p-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-8">キャラクター設定</h2>
           
           {/* デスクトップ版（lg以上）：グリッド表示 */}
           <div className="hidden lg:grid grid-cols-8 gap-4">
@@ -275,20 +275,20 @@ export default function App() {
               <div
                 key={fighter.id}
                 onClick={() => handleCardToggle(fighter.id)}
-                className={`p-4 rounded-lg shadow-md border-2 cursor-pointer transition-all hover:shadow-lg ${
+                className={`p-4 cursor-pointer transition-all ${
                   fighter.weight.player1 === 0 && fighter.weight.player2 === 0
-                    ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
-                    : 'border-orange-400 bg-orange-50 hover:border-orange-500'
+                    ? 'bg-gray-100 border-2 border-gray-300 opacity-50'
+                    : 'bg-white border-2 border-orange-400 hover:border-orange-600 hover:shadow-md'
                 }`}
               >
                 {/* キャラ名 */}
-                <p className="text-sm font-bold text-center text-gray-800 mb-3 truncate">
+                <p className="text-sm font-bold text-center text-gray-800 mb-4 truncate">
                   {fighter.name}
                 </p>
 
                 {/* プレイヤー1の比率入力 */}
-                <div className="mb-2">
-                  <label className="text-xs font-bold text-blue-600">P1比率</label>
+                <div className="mb-3">
+                  <label className="text-xs font-bold text-blue-600 block mb-1">P1比率</label>
                   <input
                     type="number"
                     min="0"
@@ -296,14 +296,14 @@ export default function App() {
                     value={fighter.weight.player1}
                     onChange={(e) => handleWeightChange(fighter.id, 'player1', e.target.value)}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full px-2 py-1 text-center text-sm font-bold border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900"
+                    className="w-full px-2 py-2 text-center text-sm font-bold border-2 border-blue-300 bg-white text-blue-900 focus:outline-none focus:border-blue-600 focus:shadow-md transition-all"
                     disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
                   />
                 </div>
 
                 {/* プレイヤー2の比率入力 */}
                 <div>
-                  <label className="text-xs font-bold text-red-600">P2比率</label>
+                  <label className="text-xs font-bold text-red-600 block mb-1">P2比率</label>
                   <input
                     type="number"
                     min="0"
@@ -311,7 +311,7 @@ export default function App() {
                     value={fighter.weight.player2}
                     onChange={(e) => handleWeightChange(fighter.id, 'player2', e.target.value)}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full px-2 py-1 text-center text-sm font-bold border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-red-900"
+                    className="w-full px-2 py-2 text-center text-sm font-bold border-2 border-red-300 bg-white text-red-900 focus:outline-none focus:border-red-600 focus:shadow-md transition-all"
                     disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
                   />
                 </div>
@@ -325,20 +325,20 @@ export default function App() {
               <div
                 key={fighter.id}
                 onClick={() => handleCardToggle(fighter.id)}
-                className={`p-4 rounded-lg shadow-md border-2 cursor-pointer transition-all hover:shadow-lg ${
+                className={`p-4 cursor-pointer transition-all ${
                   fighter.weight.player1 === 0 && fighter.weight.player2 === 0
-                    ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
-                    : 'border-orange-400 bg-orange-50 hover:border-orange-500'
+                    ? 'bg-gray-100 border-2 border-gray-300 opacity-50'
+                    : 'bg-white border-2 border-orange-400 hover:border-orange-600 hover:shadow-md'
                 }`}
               >
                 {/* キャラ名 */}
-                <p className="text-sm font-bold text-center text-gray-800 mb-3 truncate">
+                <p className="text-sm font-bold text-center text-gray-800 mb-4 truncate">
                   {fighter.name}
                 </p>
 
                 {/* プレイヤー1の比率入力 */}
-                <div className="mb-2">
-                  <label className="text-xs font-bold text-blue-600">P1</label>
+                <div className="mb-3">
+                  <label className="text-xs font-bold text-blue-600 block mb-1">P1</label>
                   <input
                     type="number"
                     min="0"
@@ -346,14 +346,14 @@ export default function App() {
                     value={fighter.weight.player1}
                     onChange={(e) => handleWeightChange(fighter.id, 'player1', e.target.value)}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full px-2 py-1 text-center text-sm font-bold border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900"
+                    className="w-full px-2 py-2 text-center text-sm font-bold border-2 border-blue-300 bg-white text-blue-900 focus:outline-none focus:border-blue-600 focus:shadow-md transition-all"
                     disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
                   />
                 </div>
 
                 {/* プレイヤー2の比率入力 */}
                 <div>
-                  <label className="text-xs font-bold text-red-600">P2</label>
+                  <label className="text-xs font-bold text-red-600 block mb-1">P2</label>
                   <input
                     type="number"
                     min="0"
@@ -361,7 +361,7 @@ export default function App() {
                     value={fighter.weight.player2}
                     onChange={(e) => handleWeightChange(fighter.id, 'player2', e.target.value)}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full px-2 py-1 text-center text-sm font-bold border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-red-900"
+                    className="w-full px-2 py-2 text-center text-sm font-bold border-2 border-red-300 bg-white text-red-900 focus:outline-none focus:border-red-600 focus:shadow-md transition-all"
                     disabled={fighter.weight.player1 === 0 && fighter.weight.player2 === 0}
                   />
                 </div>
@@ -374,10 +374,10 @@ export default function App() {
             {fighters.map(fighter => (
               <div
                 key={fighter.id}
-                className={`p-4 rounded-lg shadow-md border-2 transition-all ${
+                className={`p-4 transition-all ${
                   fighter.weight.player1 === 0 && fighter.weight.player2 === 0
-                    ? 'border-gray-300 bg-gray-50 opacity-40 grayscale'
-                    : 'border-orange-400 bg-orange-50'
+                    ? 'bg-gray-100 border-2 border-gray-300 opacity-50'
+                    : 'bg-white border-2 border-orange-400'
                 }`}
               >
                 {/* キャラ名 */}
@@ -386,50 +386,51 @@ export default function App() {
                 </p>
 
                 {/* プレイヤー1のスライダー */}
-                <div className="mb-2">
-                  <label className="text-xs font-bold text-blue-600">P1:</label>
+                <div className="mb-3">
+                  <label className="text-xs font-bold text-blue-600 block mb-1">P1:</label>
                   <input
                     type="range"
                     min="0"
                     max="10"
                     value={fighter.weight.player1}
                     onChange={(e) => handleWeightChange(fighter.id, 'player1', e.target.value)}
-                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
+                    className="w-full h-2 bg-gray-300 appearance-none cursor-pointer slider"
                     style={{
                       background: fighter.weight.player1 === 0 
                         ? '#d1d5db' 
                         : `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${fighter.weight.player1 * 10}%, #e5e7eb ${fighter.weight.player1 * 10}%, #e5e7eb 100%)`
                     }}
                   />
-                  <div className="text-center text-xs font-bold text-blue-700">{fighter.weight.player1}</div>
+                  <div className="text-center text-xs font-bold text-blue-700 mt-1">{fighter.weight.player1}</div>
                 </div>
 
                 {/* プレイヤー2のスライダー */}
-                <div className="mb-2">
-                  <label className="text-xs font-bold text-red-600">P2:</label>
+                <div className="mb-3">
+                  <label className="text-xs font-bold text-red-600 block mb-1">P2:</label>
                   <input
                     type="range"
                     min="0"
                     max="10"
                     value={fighter.weight.player2}
                     onChange={(e) => handleWeightChange(fighter.id, 'player2', e.target.value)}
-                    className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
+                    className="w-full h-2 bg-gray-300 appearance-none cursor-pointer slider"
                     style={{
                       background: fighter.weight.player2 === 0 
                         ? '#d1d5db' 
                         : `linear-gradient(to right, #ef4444 0%, #ef4444 ${fighter.weight.player2 * 10}%, #e5e7eb ${fighter.weight.player2 * 10}%, #e5e7eb 100%)`
                     }}
                   />
-                  <div className="text-center text-xs font-bold text-red-700">{fighter.weight.player2}</div>
+                  <div className="text-center text-xs font-bold text-red-700 mt-1">{fighter.weight.player2}</div>
                 </div>
 
                 {/* トグルボタン */}
                 <button
                   onClick={() => handleCardToggle(fighter.id)}
-                  className="w-full mt-2 text-xs font-bold py-1 px-2 rounded transition-all"
+                  className="w-full mt-2 text-xs font-bold py-2 px-2 transition-all border-2"
                   style={{
-                    backgroundColor: fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? '#fed7aa' : '#fef3c7',
-                    color: fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? '#92400e' : '#78350f'
+                    borderColor: fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? '#fbbf24' : '#f59e0b',
+                    backgroundColor: fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? '#fef3c7' : '#fcd34d',
+                    color: '#78350f'
                   }}
                 >
                   {fighter.weight.player1 === 0 && fighter.weight.player2 === 0 ? 'ON' : 'OFF'}
@@ -443,19 +444,19 @@ export default function App() {
       {/* モーダル（結果表示） */}
       {isShowingResult && selectedFighter1 && selectedFighter2 && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full text-center transform transition-all">
-            <p className="text-gray-600 text-lg mb-6">対戦カード</p>
+          <div className="bg-white shadow-2xl p-8 max-w-2xl w-full text-center">
+            <p className="text-gray-600 text-lg mb-8">対戦カード</p>
             <div className="grid grid-cols-2 gap-6 mb-8">
               {/* プレイヤー1 */}
-              <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-300">
-                <p className="text-sm font-bold text-blue-600 mb-2">Player 1</p>
+              <div className="bg-white border-2 border-blue-500 p-6">
+                <p className="text-sm font-bold text-blue-600 mb-3">Player 1</p>
                 <h2 className="text-5xl font-black text-blue-600">
                   {selectedFighter1.name}
                 </h2>
               </div>
               {/* プレイヤー2 */}
-              <div className="bg-red-50 rounded-xl p-6 border-2 border-red-300">
-                <p className="text-sm font-bold text-red-600 mb-2">Player 2</p>
+              <div className="bg-white border-2 border-red-500 p-6">
+                <p className="text-sm font-bold text-red-600 mb-3">Player 2</p>
                 <h2 className="text-5xl font-black text-red-600">
                   {selectedFighter2.name}
                 </h2>
@@ -463,7 +464,7 @@ export default function App() {
             </div>
             <button
               onClick={closeModal}
-              className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg shadow-md transition-all"
+              className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold transition-all hover:shadow-lg"
             >
               閉じる
             </button>
