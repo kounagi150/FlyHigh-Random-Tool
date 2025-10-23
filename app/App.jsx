@@ -225,7 +225,7 @@ export default function App() {
           <div className="flex items-center justify-between gap-4">
             {/* 中央：タイトル */}
             <div className="flex-1 flex items-center justify-center gap-4">
-              <h1 className="text-4xl font-black text-orange-600">FlyHigh!!</h1>
+              <img src="/FHTxt_touka.png" alt="FlyHigh" className="h-16 w-auto" />
               <p className="text-xl font-bold text-gray-700">Omakase Tool</p>
             </div>
             {/* 右上：ロゴ（サイズ拡大） */}
